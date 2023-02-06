@@ -18,13 +18,13 @@
 
 #define BIDIRECTIONAL 1    /* change to 1 if you're doing extra credit */
 /* and write a routine called B_output */
-/* ì–‘ë°©í–¥ ê³ ë°±ì—” í”„ë¡œí† ì½œë¡œ êµ¬í˜„*/
+/* ¾ç¹æÇâ °í¹é¿£ ÇÁ·ÎÅäÄİ·Î ±¸Çö*/
 
 
 /* a "msg" is the data unit passed from layer 5 (teachers code) to layer  */
 /* 4 (students' code).  It contains the data (characters) to be delivered */
 /* to layer 5 via the students transport level protocol entities.         */
-// layer 5ì—ì„œ ì „ë‹¬ë˜ëŠ” ë°ì´í„° ë‹¨ìœ„
+// layer 5¿¡¼­ Àü´ŞµÇ´Â µ¥ÀÌÅÍ ´ÜÀ§
 struct msg {
     char data[20];
 };
@@ -32,39 +32,39 @@ struct msg {
 /* a packet is the data unit passed from layer 4 (students code) to layer */
 /* 3 (teachers code).  Note the pre-defined packet structure, which all   */
 /* students must follow. */
-// layer 4ì—ì„œ ì „ë‹¬ë˜ëŠ” ë‹¨ìœ„
+// layer 4¿¡¼­ Àü´ŞµÇ´Â ´ÜÀ§
 struct pkt {
     int seqnum;
     int acknum;
     int checksum;
-    char payload[20];    //msgì˜ data
+    char payload[20];    //msgÀÇ data
 };
 
 
 /********* STUDENTS WRITE THE NEXT SEVEN ROUTINES *********/
 
-int send_base_A;// A sendì˜ window base num
-int send_base_B;// B sendì˜ window base num
+int send_base_A;// A sendÀÇ window base num
+int send_base_B;// B sendÀÇ window base num
 
-int next_seqnum_A; // A sendì¸¡ì˜ ë‹¤ìŒ ë³´ë‚¼ packetìœ„ì¹˜
-int next_seqnum_B; // B sendì¸¡ì˜ ë‹¤ìŒ ë³´ë‚¼ packetìœ„ì¹˜
+int next_seqnum_A; // A sendÃøÀÇ ´ÙÀ½ º¸³¾ packetÀ§Ä¡
+int next_seqnum_B; // B sendÃøÀÇ ´ÙÀ½ º¸³¾ packetÀ§Ä¡
 
-int expected_seqnum_A; // A receiveì¸¡ì˜ ì›í•˜ëŠ” seqnumë²ˆí˜¸
-int expected_seqnum_B; // B receiveì¸¡ì˜ ì›í•˜ëŠ” seqnumë²ˆí˜¸
+int expected_seqnum_A; // A receiveÃøÀÇ ¿øÇÏ´Â seqnum¹øÈ£
+int expected_seqnum_B; // B receiveÃøÀÇ ¿øÇÏ´Â seqnum¹øÈ£
 
-int A_ackstate = 0;   //ackë¥¼ ë³´ë‚´ëŠ” ìƒíƒœì¸ì§€ ì•„ë‹Œì§€ êµ¬ë³„í•˜ëŠ” ë³€ìˆ˜
-int B_ackstate = 0;   //ackë¥¼ ë³´ë‚´ëŠ” ìƒíƒœì¸ì§€ ì•„ë‹Œì§€ êµ¬ë³„í•˜ëŠ” ë³€ìˆ˜ 
+int A_ackstate = 0;   //ack¸¦ º¸³»´Â »óÅÂÀÎÁö ¾Æ´ÑÁö ±¸º°ÇÏ´Â º¯¼ö
+int B_ackstate = 0;   //ack¸¦ º¸³»´Â »óÅÂÀÎÁö ¾Æ´ÑÁö ±¸º°ÇÏ´Â º¯¼ö 
 
-int A_my_acknum = 0;  //ëˆ„ì  ackì„ ê°–ëŠ” ë³€ìˆ˜, ackì—­í• ì„ í•˜ì§€ì•Šì„ì‹œ 999ë¥¼ ê°€ì§
-int B_my_acknum = 0;  //ëˆ„ì  ackì„ ê°–ëŠ” ë³€ìˆ˜, ackì—­í• ì„ í•˜ì§€ì•Šì„ì‹œ 999ë¥¼ ê°€ì§
+int A_my_acknum = 0;  //´©Àû ackÀ» °®´Â º¯¼ö, ack¿ªÇÒÀ» ÇÏÁö¾ÊÀ»½Ã 999¸¦ °¡Áü
+int B_my_acknum = 0;  //´©Àû ackÀ» °®´Â º¯¼ö, ack¿ªÇÒÀ» ÇÏÁö¾ÊÀ»½Ã 999¸¦ °¡Áü
 
-#define WINDOWSIZE 40   //window size N = 40ìœ¼ë¡œ í•¨
-#define TIMEOUT 10 //TIME OUTì„ 10ìœ¼ë¡œ í•¨
+#define WINDOWSIZE 40   //window size N = 40À¸·Î ÇÔ
+#define TIMEOUT 1000 //TIME OUTÀ» 10À¸·Î ÇÔ
 
-struct pkt pkt_A_window[1024];  //A outputì—ì„œ ë³´ë‚´ëŠ” íŒ¨í‚·ì„ ì €ì¥í•˜ëŠ” ì¥ì†Œì´ë©° ì¶”í›„ì— ìœˆë„ìš°ê°€ ë¨ ìˆ˜ ìˆìŒìœ¼ë¡œ ì¥ì†Œì˜ ì‚¬ì´ì¦ˆëŠ” ë„‰ë„‰íˆ ì¡ì•„ì£¼ë©° ì •í™•í•œ ìœˆë„ìš° ì‚¬ì´ì¦ˆëŠ” WINDOWSIZEë¡œ ì •ì˜
-struct pkt pkt_B_window[1024];  //B outputì—ì„œ ë³´ë‚´ëŠ” íŒ¨í‚·ì„ ì €ì¥í•˜ëŠ” ì¥ì†Œì´ë©° ì¶”í›„ì— ìœˆë„ìš°ê°€ ë¨ ìˆ˜ ìˆìŒìœ¼ë¡œ ì¥ì†Œì˜ ì‚¬ì´ì¦ˆëŠ” ë„‰ë„‰íˆ ì¡ì•„ì£¼ë©° ì •í™•í•œ ìœˆë„ìš° ì‚¬ì´ì¦ˆëŠ” WINDOWSIZEë¡œ ì •ì˜
+struct pkt pkt_A_window[1024];  //A output¿¡¼­ º¸³»´Â ÆĞÅ¶À» ÀúÀåÇÏ´Â Àå¼ÒÀÌ¸ç ÃßÈÄ¿¡ À©µµ¿ì°¡ µÊ ¼ö ÀÖÀ½À¸·Î Àå¼ÒÀÇ »çÀÌÁî´Â ³Ë³ËÈ÷ Àâ¾ÆÁÖ¸ç Á¤È®ÇÑ À©µµ¿ì »çÀÌÁî´Â WINDOWSIZE·Î Á¤ÀÇ
+struct pkt pkt_B_window[1024];  //B output¿¡¼­ º¸³»´Â ÆĞÅ¶À» ÀúÀåÇÏ´Â Àå¼ÒÀÌ¸ç ÃßÈÄ¿¡ À©µµ¿ì°¡ µÊ ¼ö ÀÖÀ½À¸·Î Àå¼ÒÀÇ »çÀÌÁî´Â ³Ë³ËÈ÷ Àâ¾ÆÁÖ¸ç Á¤È®ÇÑ À©µµ¿ì »çÀÌÁî´Â WINDOWSIZE·Î Á¤ÀÇ
 
-//A side ë³€ìˆ˜ë¥¼ ì´ˆê¸°í™”
+//A side º¯¼ö¸¦ ÃÊ±âÈ­
 void A_init(void)
 {
     memset(pkt_A_window, 0, 1024);
@@ -75,7 +75,7 @@ void A_init(void)
     A_my_acknum = 0;
 }
 
-//B side ë³€ìˆ˜ë¥¼ ì´ˆê¸°í™”
+//B side º¯¼ö¸¦ ÃÊ±âÈ­
 void B_init(void)
 {
     memset(pkt_B_window, 0, 1024);
@@ -86,27 +86,27 @@ void B_init(void)
     B_my_acknum = 0;
 }
 
-//checksumì„ ê³„ì‚°í•˜ëŠ” í•¨ìˆ˜
-//seqnum, acknum, payloadì˜ ê° ë¬¸ìì˜ ì•„ìŠ¤í‚¤ì½”ë“œì˜ í•©ì„ ë°˜í™˜
-//ëª¨ë‘ ë‹¤ ë”í•¨ìœ¼ë¡œì¨ í•˜ë‚˜ë¼ë„ í‹€ë¦°ë‹¤ë©´ íŒë³„ê°€ëŠ¥í•¨
+//checksumÀ» °è»êÇÏ´Â ÇÔ¼ö
+//seqnum, acknum, payloadÀÇ °¢ ¹®ÀÚÀÇ ¾Æ½ºÅ°ÄÚµåÀÇ ÇÕÀ» ¹İÈ¯
+//¸ğµÎ ´Ù ´õÇÔÀ¸·Î½á ÇÏ³ª¶óµµ Æ²¸°´Ù¸é ÆÇº°°¡´ÉÇÔ
 
 int getchecksum(struct pkt packet)
 {
-    // checksum êµ¬í•˜ëŠ” í•¨ìˆ˜
-    //ì—‘ìŠ¤íŠ¸ë¼ í¬ë˜ë”§ ë°©ì‹ìœ¼ë¡œëŠ” êµ¬í˜„í•˜ì§€ ëª»í•˜ì˜€ìŠµë‹ˆë‹¤
+    // checksum ±¸ÇÏ´Â ÇÔ¼ö
+    //¿¢½ºÆ®¶ó Å©·¡µ÷ ¹æ½ÄÀ¸·Î´Â ±¸ÇöÇÏÁö ¸øÇÏ¿´½À´Ï´Ù
     int checksum = 0;
     checksum += packet.seqnum;
     checksum += packet.acknum;
     for (int i = 0; i < sizeof(packet.payload) / sizeof(char); i++)
-        checksum += packet.payload[i];    //ëª¨ë‘ ë”í•˜ì—¬ checksumì„¤ì •
+        checksum += packet.payload[i];    //¸ğµÎ ´õÇÏ¿© checksum¼³Á¤
     return checksum;
 }
 
 struct pkt pkt_make(int seqnum, int acknum, char* data)
 {
-    //packetì„ ë§Œë“œëŠ” í•¨ìˆ˜
+    //packetÀ» ¸¸µå´Â ÇÔ¼ö
     // 
-    //ìƒˆë¡œìš´ packetì„ ìƒì„±í•˜ê³  ì´ˆê¸°í™”í•˜ëŠ” ê³¼ì •
+    //»õ·Î¿î packetÀ» »ı¼ºÇÏ°í ÃÊ±âÈ­ÇÏ´Â °úÁ¤
     struct pkt new_pkt;
     new_pkt.seqnum = seqnum;
     new_pkt.acknum = acknum;
@@ -120,110 +120,110 @@ struct pkt pkt_make(int seqnum, int acknum, char* data)
 /* called from layer 5, passed the data to be sent to other side */
 A_output(struct msg message)   
 {
-    //layer5ì—ì„œ ë°ì´í„° messageë¥¼ ë°›ê³  íŒ¨í‚·ì„ ë§Œë“¤ì–´ Aì—ì„œ Bë¡œì˜ íŒ¨í‚·ê³¼ ì•¡í¬ì„ í•¨ê»˜ ë³´ë‚´ê¸°ìœ„í•´ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
+    //layer5¿¡¼­ µ¥ÀÌÅÍ message¸¦ ¹Ş°í ÆĞÅ¶À» ¸¸µé¾î A¿¡¼­ B·ÎÀÇ ÆĞÅ¶°ú ¾×Å©À» ÇÔ²² º¸³»±âÀ§ÇØ È£ÃâµÇ´Â ÇÔ¼ö
 
     if (next_seqnum_A < send_base_A + WINDOWSIZE)
     {
         if (A_ackstate == 0)
-            A_my_acknum = 999;   //ë‹¤ë¥¸ ì‚¬ì´ë“œì˜ senderì—ê²Œì„œ ë°›ì€ ackê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš° 
-        struct pkt received_packet_for_layer5;    //ë³´ë‚¼ packet
-        received_packet_for_layer5 = pkt_make(next_seqnum_A, A_my_acknum, message.data); //messageë¥¼ ì¶”ì¶œí•˜ê³  packetì„ ìƒì„±í•¨
-        pkt_A_window[next_seqnum_A-1] = received_packet_for_layer5;  //A ì‚¬ì´ë“œì˜ windowì— packetì„ ì €ì¥
-        tolayer3(0, received_packet_for_layer5);   //packetì„ B_inputìœ¼ë¡œ ì „ì†¡ ë³´ëƒ„
-        if (A_my_acknum!=999)   //ackë¥¼ ê°™ì´ ë³´ë‚´ëŠ” ê²½ìš° ì¶œë ¥
+            A_my_acknum = 999;   //´Ù¸¥ »çÀÌµåÀÇ sender¿¡°Ô¼­ ¹ŞÀº ack°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì 
+        struct pkt received_packet_for_layer5;    //º¸³¾ packet
+        received_packet_for_layer5 = pkt_make(next_seqnum_A, A_my_acknum, message.data); //message¸¦ ÃßÃâÇÏ°í packetÀ» »ı¼ºÇÔ
+        pkt_A_window[next_seqnum_A-1] = received_packet_for_layer5;  //A »çÀÌµåÀÇ window¿¡ packetÀ» ÀúÀå
+        tolayer3(0, received_packet_for_layer5);   //packetÀ» B_inputÀ¸·Î Àü¼Û º¸³¿
+        if (A_my_acknum!=999)   //ack¸¦ °°ÀÌ º¸³»´Â °æ¿ì Ãâ·Â
         {
             printf("A_output : send_packet with ACK (ACK = %d, seq = %d) : ", received_packet_for_layer5.acknum, received_packet_for_layer5.seqnum);
             for (int i = 0; i < 20; i++)
                 printf("%c", received_packet_for_layer5.payload[i]);
             printf("\n");
         }
-        else //nakì—¬ì„œ acknumì— 999ë¥¼ ë³´ë‚´ëŠ” ê²½ìš° ì¶œë ¥
+        else //nak¿©¼­ acknum¿¡ 999¸¦ º¸³»´Â °æ¿ì Ãâ·Â
         {
             printf("A_output : send_packet without ACK (seq = %d) : ", received_packet_for_layer5.seqnum);
             for (int i = 0; i < 20; i++)
                 printf("%c", received_packet_for_layer5.payload[i]);
             printf("\n");
         }
-        A_ackstate = 0;   // ackë¥¼ ë³´ëƒˆë‹¤ê³  ê°€ì •í•˜ê³  ACKstate ë¥¼ 0 ìœ¼ë¡œ ë³€ê²½í•´ì£¼ì–´ ACKë¥¼ ë³´ë‚´ì§€ ì•ŠëŠ” ìƒíƒœë¥¼ ì˜ë¯¸í•˜ë„ë¡ ì‚¬ìš©í•¨
+        A_ackstate = 0;   // ack¸¦ º¸³Â´Ù°í °¡Á¤ÇÏ°í ACKstate ¸¦ 0 À¸·Î º¯°æÇØÁÖ¾î ACK¸¦ º¸³»Áö ¾Ê´Â »óÅÂ¸¦ ÀÇ¹ÌÇÏµµ·Ï »ç¿ëÇÔ
 
         if (send_base_A == next_seqnum_A)
         {
-            //stoptimer(0, (float)TIMEOUT);//ì•ˆì „í•œ ì¼œê¸°ë¥¼ ìœ„í•œ íƒ€ì´ë¨¸ ê»ë‹¤ í‚¤ê¸°
-            starttimer(0, (float)TIMEOUT); //timerë¥¼ ì‹œì‘í•¨
+            //stoptimer(0, (float)TIMEOUT);//¾ÈÀüÇÑ ÄÑ±â¸¦ À§ÇÑ Å¸ÀÌ¸Ó ²¯´Ù Å°±â
+            starttimer(0, (float)TIMEOUT); //timer¸¦ ½ÃÀÛÇÔ
         }
             
-        next_seqnum_A++;    //next sequence numberë¥¼ 1ì¦ê°€ì‹œí‚´
+        next_seqnum_A++;    //next sequence number¸¦ 1Áõ°¡½ÃÅ´
         
     }
     else
     {
         printf("A_output : Buffer is full.Drop the message.\n");
 
-        //data ì „ì†¡ì„ ê±°ë¶€í•œë‹¤.
+        //data Àü¼ÛÀ» °ÅºÎÇÑ´Ù.
     }
 }
 
 B_output(struct msg message)  
 {
-    //layer5ì—ì„œ ë°ì´í„° messageë¥¼ ë°›ê³  íŒ¨í‚·ì„ ë§Œë“¤ì–´ Bì—ì„œ Aë¡œì˜ íŒ¨í‚·ê³¼ ì•¡í¬ì„ í•¨ê»˜ ë³´ë‚´ê¸°ìœ„í•´ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
+    //layer5¿¡¼­ µ¥ÀÌÅÍ message¸¦ ¹Ş°í ÆĞÅ¶À» ¸¸µé¾î B¿¡¼­ A·ÎÀÇ ÆĞÅ¶°ú ¾×Å©À» ÇÔ²² º¸³»±âÀ§ÇØ È£ÃâµÇ´Â ÇÔ¼ö
     if (next_seqnum_B < send_base_B + WINDOWSIZE)
     {
         if (B_ackstate == 0)
-            B_my_acknum = 999;   //ë‹¤ë¥¸ ì‚¬ì´ë“œì˜ senderì—ê²Œì„œ ë°›ì€ ackê°€ ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê²½ìš°  
-        struct pkt received_packet_for_layer5;    //ë³´ë‚¼ packet
-        received_packet_for_layer5 = pkt_make(next_seqnum_B, B_my_acknum, message.data);  //messageë¥¼ ì¶”ì¶œí•˜ê³  packetì„ ìƒì„±í•¨
-        pkt_B_window[next_seqnum_B-1] = received_packet_for_layer5;  //B ì‚¬ì´ë“œì˜ windowì— packetì„ ì €ì¥
-        tolayer3(1, received_packet_for_layer5);   //packetì„ A_inputìœ¼ë¡œ ì „ì†¡ ë³´ëƒ„
-        if (B_my_acknum!=999)   //ackë¥¼ ê°™ì´ ë³´ë‚´ëŠ” ê²½ìš° ì¶œë ¥
+            B_my_acknum = 999;   //´Ù¸¥ »çÀÌµåÀÇ sender¿¡°Ô¼­ ¹ŞÀº ack°¡ Á¸ÀçÇÏÁö ¾Ê´Â °æ¿ì  
+        struct pkt received_packet_for_layer5;    //º¸³¾ packet
+        received_packet_for_layer5 = pkt_make(next_seqnum_B, B_my_acknum, message.data);  //message¸¦ ÃßÃâÇÏ°í packetÀ» »ı¼ºÇÔ
+        pkt_B_window[next_seqnum_B-1] = received_packet_for_layer5;  //B »çÀÌµåÀÇ window¿¡ packetÀ» ÀúÀå
+        tolayer3(1, received_packet_for_layer5);   //packetÀ» A_inputÀ¸·Î Àü¼Û º¸³¿
+        if (B_my_acknum!=999)   //ack¸¦ °°ÀÌ º¸³»´Â °æ¿ì Ãâ·Â
         {
             printf("B_output : send_packet with ACK (ACK = %d, seq = %d) : ", received_packet_for_layer5.acknum, received_packet_for_layer5.seqnum);
             for (int i = 0; i < 20; i++)
                 printf("%c", received_packet_for_layer5.payload[i]);
             printf("\n");
         }
-        else //nakì—¬ì„œ acknumì— 999ë¥¼ ë³´ë‚´ëŠ” ê²½ìš° ì¶œë ¥
+        else //nak¿©¼­ acknum¿¡ 999¸¦ º¸³»´Â °æ¿ì Ãâ·Â
         {
             printf("B_output : send_packet without ACK (seq = %d) : ", received_packet_for_layer5.seqnum);
             for (int i = 0; i < 20; i++)
                 printf("%c", received_packet_for_layer5.payload[i]);
             printf("\n");
         }
-        B_ackstate = 0;   // ackë¥¼ ë³´ëƒˆë‹¤ê³  ê°€ì •í•˜ê³  ACKstate ë¥¼ 0 ìœ¼ë¡œ ë³€ê²½í•´ì£¼ì–´ ACKë¥¼ ë³´ë‚´ì§€ ì•ŠëŠ” ìƒíƒœë¥¼ ì˜ë¯¸í•˜ë„ë¡ ì‚¬ìš©í•¨ ì´ í•¨ìˆ˜ëŠ” ì¬ì‚¬ìš©í•¨ìœ¼ë¡œ ë‹¤ìŒë²ˆ ì‚¬ìš©ì— ìˆì–´ì„œ ì• í¬ë¥¼ ë³´ë‚´ì§€ ë§ì•„ì•¼í•˜ê¸°ì—
+        B_ackstate = 0;   // ack¸¦ º¸³Â´Ù°í °¡Á¤ÇÏ°í ACKstate ¸¦ 0 À¸·Î º¯°æÇØÁÖ¾î ACK¸¦ º¸³»Áö ¾Ê´Â »óÅÂ¸¦ ÀÇ¹ÌÇÏµµ·Ï »ç¿ëÇÔ ÀÌ ÇÔ¼ö´Â Àç»ç¿ëÇÔÀ¸·Î ´ÙÀ½¹ø »ç¿ë¿¡ ÀÖ¾î¼­ ¾ÖÅ©¸¦ º¸³»Áö ¸»¾Æ¾ßÇÏ±â¿¡
 
         if (send_base_B == next_seqnum_B)
         {
-            //stoptimer(1, (float)TIMEOUT);//ì•ˆì „í•œ ì¼œê¸°ë¥¼ ìœ„í•œ íƒ€ì´ë¨¸ ê»ë‹¤ í‚¤ê¸°
-            starttimer(1, (float)TIMEOUT); //timerë¥¼ ì‹œì‘í•¨
+            //stoptimer(1, (float)TIMEOUT);//¾ÈÀüÇÑ ÄÑ±â¸¦ À§ÇÑ Å¸ÀÌ¸Ó ²¯´Ù Å°±â
+            starttimer(1, (float)TIMEOUT); //timer¸¦ ½ÃÀÛÇÔ
 
         }
             
-        next_seqnum_B++;    //next sequence numberë¥¼ 1ì¦ê°€ì‹œí‚´
+        next_seqnum_B++;    //next sequence number¸¦ 1Áõ°¡½ÃÅ´
     }
     else {
         printf("B_output : Buffer is full.Drop the message.\n");
-        //data ì „ì†¡ ê±°ë¶€ ë“œë
+        //data Àü¼Û °ÅºÎ µå¶ø
     }
 }
 
 /* called from layer 3, when a packet arrives for layer 4 */
 A_input(struct pkt packet) 
 {
-    //Aì˜ receiverì´ë©° Bì—ê²Œì„œ packetì„ ë°›ì„ê²½ìš° í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
-    A_ackstate = 1;// ì„¼ë”ê°€ ackë¥¼ ë³´ë‚¼ ìˆ˜ ìˆëŠ” ìƒíƒœë¡œ ë§Œë“¤ì–´ ì¤Œ
+    //AÀÇ receiverÀÌ¸ç B¿¡°Ô¼­ packetÀ» ¹ŞÀ»°æ¿ì È£ÃâµÇ´Â ÇÔ¼ö
+    A_ackstate = 1;// ¼¾´õ°¡ ack¸¦ º¸³¾ ¼ö ÀÖ´Â »óÅÂ·Î ¸¸µé¾î ÁÜ
 
-    // ë°›ì€ íŒ¨í‚·ì˜ checksum ê²°ê³¼ë¥¼ ë¹„êµí•¨
+    // ¹ŞÀº ÆĞÅ¶ÀÇ checksum °á°ú¸¦ ºñ±³ÇÔ
     if (getchecksum(packet) == packet.checksum) 
     {
-        //checksumì— ì´ìƒì´ ì—†ëŠ” ê²½ìš°
+        //checksum¿¡ ÀÌ»óÀÌ ¾ø´Â °æ¿ì
         printf("A_input : recv packet (seq = %d) : ", packet.seqnum);
         for (int i = 0; i < 20; i++)
             printf("%c", packet.payload[i]);
         printf("\n");
 
-        int acknum = packet.acknum; //packetì˜ acknumì„ ì¶”ì¶œ
-        int seqnum = packet.seqnum; //packetì˜ seqnumì„ ì¶”ì¶œ
+        int acknum = packet.acknum; //packetÀÇ acknumÀ» ÃßÃâ
+        int seqnum = packet.seqnum; //packetÀÇ seqnumÀ» ÃßÃâ
         /*
-        //ë””ë²„ê¹…ì„ ìœ„í•´ ì¶”ì¶œê°’ì„ í™•ì¸í•˜ëŠ” ì¶œë ¥ë¬¸ì´ë‹¤.
+        //µğ¹ö±ëÀ» À§ÇØ ÃßÃâ°ªÀ» È®ÀÎÇÏ´Â Ãâ·Â¹®ÀÌ´Ù.
         //printf("seqnum : %d \n", seqnum);
         //printf("expected_seqnum_B : %d \n", expected_seqnum_B);
         //printf("next_seqnum_B : %d \n", next_seqnum_B);
@@ -231,105 +231,105 @@ A_input(struct pkt packet)
         int ack_check=0;
 
 
-        //receiverë¡œì„œ ë™ì‘
+        //receiver·Î¼­ µ¿ÀÛ
         if (expected_seqnum_A == seqnum)
         {
-            // Expected_seqnum == next_seqnum(ì¦‰ íŒ¨í‚·ì˜ seqnum)ì´ìœ ëŠ” íŒ¨í‚·ì„ ë§Œë“¤ ë•Œ ë„¥ìŠ¤íŠ¸ ì‹œí€€ìŠ¤ë„˜ë²„ë¥¼ ë„£ì–´ì¤Œìœ¼ë¡œ ê¸°ëŒ€í•˜ëŠ” ì‹œí€€ìŠ¤ëŠ” íŒ¨í‚·ë‚´ë¶€ì˜ ì‹œí€€ìŠ¤ ë„˜ë²„ì´ë‹¹.
-            //(ì—¬ê¸° ë¶€ë¶„ ì¤‘ìš”)
-            tolayer5(0, packet.payload);    //layer5 ì—ê²Œ data ì „ë‹¬
-            A_my_acknum = expected_seqnum_A; //acknumì„ expected sequence numberë¡œ ì €ì¥í•˜ë©° ê°±ì‹ 
-            printf("A_input : make ACK and Bì‚¬ì´ë“œì— ë³´ë‚¼ ACK (ëˆ„ì  ack í˜¹ì€ ì‹¤ì‹œê°„ ìœ¼ë¡œ ê°±ì‹ í•œ ack = %d)\n", A_my_acknum);
-            expected_seqnum_A++;    //Bì˜ expected seqeunce numberë¥¼ 1ì¦ê°€ì‹œí‚´ ì´ìœ ëŠ” ë‹¤ìŒì—ë„ ê°™ì€ ì˜ì—­ìœ¼ë¡œ ì „ë‹¬í•˜ëŠ” íŒ¨í‚·ì„ ë°›ì„ ë•Œ í™•ì¸í•´ì•¼í•˜ê³  ì´ë•Œ ê¸°ëŒ€í•˜ëŠ” ì‹œí€€ìŠ¤ ë„˜ë²„ëŠ” ì´ ë¶€ë¶„ì„ ì§€ë‚œ ë‹¤ìŒ
-                                    //ìˆ«ì 1ì´ ì¦ê°€í•œ ìƒíƒœì—ì„œ ë¹„êµ í•´ì•¼í•¨ìœ¼ë¡œ (ì—¬ê¸° ë¶€ë¶„ ì¤‘ìš”)
-            ack_check++; //ackë¥¼ ì±„í¬í•¨ìœ¼ë¡œì¨ 999ê°€ ë“¤ì–´ì™”ì„ ë•Œ ì´ˆê¸°ì˜ ackë¥¼ ê°€ì§€ê³  ìˆì§€ ì•Šì•„ì„œ 999ê°€ ë“¤ì–´ì™”ëŠ”ì§€ nakì˜ ì—­í• ì„ í•˜ëŠ” 999ì¸ì§€ íŒë‹¨í•œë‹¤. 
+            // Expected_seqnum == next_seqnum(Áï ÆĞÅ¶ÀÇ seqnum)ÀÌÀ¯´Â ÆĞÅ¶À» ¸¸µé ¶§ ³Ø½ºÆ® ½ÃÄö½º³Ñ¹ö¸¦ ³Ö¾îÁÜÀ¸·Î ±â´ëÇÏ´Â ½ÃÄö½º´Â ÆĞÅ¶³»ºÎÀÇ ½ÃÄö½º ³Ñ¹öÀÌ´ç.
+            //(¿©±â ºÎºĞ Áß¿ä)
+            tolayer5(0, packet.payload);    //layer5 ¿¡°Ô data Àü´Ş
+            A_my_acknum = expected_seqnum_A; //acknumÀ» expected sequence number·Î ÀúÀåÇÏ¸ç °»½Å
+            printf("A_input :got ACK and make ACK Áï B»çÀÌµå¿¡ º¸³¾ ACK (´©Àû ack È¤Àº ½Ç½Ã°£ À¸·Î °»½ÅÇÑ ack = %d)\n", A_my_acknum);
+            expected_seqnum_A++;    //BÀÇ expected seqeunce number¸¦ 1Áõ°¡½ÃÅ´ ÀÌÀ¯´Â ´ÙÀ½¿¡µµ °°Àº ¿µ¿ªÀ¸·Î Àü´ŞÇÏ´Â ÆĞÅ¶À» ¹ŞÀ» ¶§ È®ÀÎÇØ¾ßÇÏ°í ÀÌ¶§ ±â´ëÇÏ´Â ½ÃÄö½º ³Ñ¹ö´Â ÀÌ ºÎºĞÀ» Áö³­ ´ÙÀ½
+                                    //¼ıÀÚ 1ÀÌ Áõ°¡ÇÑ »óÅÂ¿¡¼­ ºñ±³ ÇØ¾ßÇÔÀ¸·Î (¿©±â ºÎºĞ Áß¿ä)
+            ack_check++; //ack¸¦ Ã¤Å©ÇÔÀ¸·Î½á 999°¡ µé¾î¿ÔÀ» ¶§ ÃÊ±âÀÇ ack¸¦ °¡Áö°í ÀÖÁö ¾Ê¾Æ¼­ 999°¡ µé¾î¿Ô´ÂÁö nakÀÇ ¿ªÇÒÀ» ÇÏ´Â 999ÀÎÁö ÆÇ´ÜÇÑ´Ù. 
 
         }
         else 
         {
-            //out of orderì˜ ê²½ìš°
-            printf("A_input : not the expected seq. (expected_seq = %d)\n", expected_seqnum_A); //ë”°ë¡œ ë„¤í¬ëŠ” ë³´ë‚´ì£¼ì§€ ì•ŠëŠ”ë‹¤.
+            //out of orderÀÇ °æ¿ì
+            printf("A_input : not the expected seq. (expected_seq = %d)\n", expected_seqnum_A); //µû·Î ³×Å©´Â º¸³»ÁÖÁö ¾Ê´Â´Ù.
 
         }
-        //senderë¡œì„œì˜ ë™ì‘
-        if (acknum != 999&& ack_check !=0 )  //acknum ì´ 999ê°€ ì•„ë‹ë•Œ, ì¦‰ NAKê°€ ì•„ë‹ë•Œ
+        //sender·Î¼­ÀÇ µ¿ÀÛ
+        if (acknum != 999&& ack_check !=0 )  //acknum ÀÌ 999°¡ ¾Æ´Ò¶§, Áï NAK°¡ ¾Æ´Ò¶§
         {
             send_base_A = acknum + 1;
             if (send_base_A == next_seqnum_A)
             {
                 
-                stoptimer(0, (float)TIMEOUT);//íƒ€ì´ë¨¸ ë„ê¸°
+                stoptimer(0, (float)TIMEOUT);//Å¸ÀÌ¸Ó ²ô±â
                 printf("A_input : stop timer.\n");
             }
             else
             {
                
-                stoptimer(0, (float)TIMEOUT);//ì•ˆì „í•œ ì¼œê¸°ë¥¼ ìœ„í•œ íƒ€ì´ë¨¸ ê»ë‹¤ í‚¤ê¸°
-                starttimer(0, (float)TIMEOUT);//íƒ€ì´ë¨¸ ì¼œê¸° íƒ€ì´ë¨¸ ì—°ì¥ ëŠë‚Œ
+                stoptimer(0, (float)TIMEOUT);//¾ÈÀüÇÑ ÄÑ±â¸¦ À§ÇÑ Å¸ÀÌ¸Ó ²¯´Ù Å°±â
+                starttimer(0, (float)TIMEOUT);//Å¸ÀÌ¸Ó ÄÑ±â Å¸ÀÌ¸Ó ¿¬Àå ´À³¦
                 printf("A_input : start timer.\n");
             }
         }
         
-        else if(acknum == 999 && ack_check==0)//acknumì´ ì‹¤í–‰ ì´ˆê¸°ì˜ ackë¥¼ ê°€ì§€ê³  ìˆì§€ ì•Šì•„ì„œ 999ì¼ë•Œë¥¼ ì œì™¸í•˜ê³  ì¦‰ NAKì˜ ì—­í• ì„ í•˜ëŠ” 999ì¼ë•Œ
+        else if(acknum == 999 && ack_check==0)//acknumÀÌ ½ÇÇà ÃÊ±âÀÇ ack¸¦ °¡Áö°í ÀÖÁö ¾Ê¾Æ¼­ 999ÀÏ¶§¸¦ Á¦¿ÜÇÏ°í Áï NAKÀÇ ¿ªÇÒÀ» ÇÏ´Â 999ÀÏ¶§
         {
             //Got NAK
-            printf("A_input : got NAK (ack = %d) drop\n", packet.acknum);// ë„¤í¬ëŠ” ì²˜ë¦¬ ì•Šê³  ê·¸ëƒ¥ ë²„ë¦¼
+            printf("A_input : got NAK (ack = %d) drop\n", packet.acknum);// ³×Å©´Â Ã³¸® ¾Ê°í ±×³É ¹ö¸²
         }
         
     }
-    else  //checksumì— ì´ìƒì´ ìˆëŠ” ê²½ìš° ë°›ì€ packet ë²„ë¦¼
+    else  //checksum¿¡ ÀÌ»óÀÌ ÀÖ´Â °æ¿ì ¹ŞÀº packet ¹ö¸²
     {
         //Packet corrupted
-        printf("A_input : Packet corrupted (seq = %d). Drop\n", packet.seqnum);//checksumì— ì´ìƒì´ ìˆëŠ” ê²½ìš° ë°›ì€ packet ë²„ë¦¼
+        printf("A_input : Packet corrupted (seq = %d). Drop\n", packet.seqnum);//checksum¿¡ ÀÌ»óÀÌ ÀÖ´Â °æ¿ì ¹ŞÀº packet ¹ö¸²
     }
 }
 
 
 B_input(struct pkt packet)
 {
-    //Bì˜ ì˜ì—­ì˜ receiverì´ë©° Aì˜ì—­ ì—ê²Œì„œ packetì„ ë°›ì„ê²½ìš° í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
-    B_ackstate = 1;//  Bì˜ì—­ ì„¼ë”ê°€ ackë¥¼ ë³´ë‚¼ ìˆ˜ ìˆëŠ” ìƒíƒœë¡œ ë§Œë“¤ì–´ ì¤Œ
+    //BÀÇ ¿µ¿ªÀÇ receiverÀÌ¸ç A¿µ¿ª ¿¡°Ô¼­ packetÀ» ¹ŞÀ»°æ¿ì È£ÃâµÇ´Â ÇÔ¼ö
+    B_ackstate = 1;//  B¿µ¿ª ¼¾´õ°¡ ack¸¦ º¸³¾ ¼ö ÀÖ´Â »óÅÂ·Î ¸¸µé¾î ÁÜ
 
-    // ë°›ì€ íŒ¨í‚·ì˜ checksum ê²°ê³¼ ë¹„êµ
+    // ¹ŞÀº ÆĞÅ¶ÀÇ checksum °á°ú ºñ±³
     if (getchecksum(packet) == packet.checksum) 
     {
-        //checksumì— ì´ìƒì´ ì—†ëŠ” ê²½ìš°
+        //checksum¿¡ ÀÌ»óÀÌ ¾ø´Â °æ¿ì
         printf("B_input : recv packet (seq = %d) : ", packet.seqnum);
         for (int i = 0; i < 20; i++)
             printf("%c", packet.payload[i]);
         printf("\n");
-        int acknum = packet.acknum; //packetì˜ acknum ì¶”ì¶œ
-        int seqnum = packet.seqnum; //packetì˜ seqnum ì¶”ì¶œ
+        int acknum = packet.acknum; //packetÀÇ acknum ÃßÃâ
+        int seqnum = packet.seqnum; //packetÀÇ seqnum ÃßÃâ
 
 
         /*
-        //ë””ë²„ê¹…ì„ ìœ„í•´ ì¶”ì¶œê°’ì„ í™•ì¸í•˜ëŠ” ì¶œë ¥ë¬¸ì´ë‹¤.
+        //µğ¹ö±ëÀ» À§ÇØ ÃßÃâ°ªÀ» È®ÀÎÇÏ´Â Ãâ·Â¹®ÀÌ´Ù.
         //printf("seqnum : %d \n", seqnum);
         //printf("expected_seqnum_A : %d \n", expected_seqnum_A);
         //printf("next_seqnum_A : %d \n", next_seqnum_A);
         */
 
-        int ack_check = 0;//íŒ¨í‚·ì´ ë°ì´í„°ê°€ ê¸°ëŒ€í•˜ëŠ” ì‹œí¬ë„˜ì„ ë§Œì¡±í•˜ì—¬ ì•¡í¬ë¥¼ ìƒì‚°í•˜ëŠ”ì§€ í™•ì¸í•˜ëŠ” ë³€ìˆ˜
+        int ack_check = 0;//ÆĞÅ¶ÀÌ µ¥ÀÌÅÍ°¡ ±â´ëÇÏ´Â ½ÃÅ©³ÑÀ» ¸¸Á·ÇÏ¿© ¾×Å©¸¦ »ı»êÇÏ´ÂÁö È®ÀÎÇÏ´Â º¯¼ö
 
-        //receiverë¡œì„œì˜ ë™ì‘
+        //receiver·Î¼­ÀÇ µ¿ÀÛ
         if (expected_seqnum_B == seqnum) 
         {
-            // Expected_seqnum == next_seqnum(ì¦‰ íŒ¨í‚·ì˜ seqnum)ì´ìœ ëŠ” íŒ¨í‚·ì„ ë§Œë“¤ ë•Œ ë„¥ìŠ¤íŠ¸ ì‹œí€€ìŠ¤ë„˜ë²„ë¥¼ ë„£ì–´ì¤Œìœ¼ë¡œ ê¸°ëŒ€í•˜ëŠ” ì‹œí€€ìŠ¤ëŠ” íŒ¨í‚·ë‚´ë¶€ì˜ ì‹œí€€ìŠ¤ ë„˜ë²„ì´ë‹¹.
-            //(ì—¬ê¸° ë¶€ë¶„ ì¤‘ìš”)
-            tolayer5(1, packet.payload);    //layer5 ì—ê²Œ data ì „ë‹¬
-            B_my_acknum = expected_seqnum_B; //acknumì„ expected sequence numberë¡œ ì €ì¥í•˜ë©° ê°±ì‹ 
-            printf("B_input : make ACK and A ì‚¬ì´ë“œì— ë³´ë‚¼ ACK (ëˆ„ì  ack í˜¹ì€ ì‹¤ì‹œê°„ ìœ¼ë¡œ ê°±ì‹ í•œ ack = %d)\n", B_my_acknum);
-            expected_seqnum_B++;     //Bì˜ expected seqeunce numberë¥¼ 1ì¦ê°€ì‹œí‚´ ì´ìœ ëŠ” ë‹¤ìŒì—ë„ ê°™ì€ ì˜ì—­ìœ¼ë¡œ ì „ë‹¬í•˜ëŠ” íŒ¨í‚·ì„ ë°›ì„ ë•Œ í™•ì¸í•´ì•¼í•˜ê³  ì´ë•Œ ê¸°ëŒ€í•˜ëŠ” ì‹œí€€ìŠ¤ ë„˜ë²„ëŠ” ì´ ë¶€ë¶„ì„ ì§€ë‚œ ë‹¤ìŒ
-                                    //ìˆ«ì 1ì´ ì¦ê°€í•œ ìƒíƒœì—ì„œ ë¹„êµ í•´ì•¼í•¨ìœ¼ë¡œ (ì—¬ê¸° ë¶€ë¶„ ì¤‘ìš”)
-            ack_check++; //ackë¥¼ ì±„í¬í•¨ìœ¼ë¡œì¨ 999ê°€ ë“¤ì–´ì™”ì„ ë•Œ ì´ˆê¸°ì˜ ackë¥¼ ê°€ì§€ê³  ìˆì§€ ì•Šì•„ì„œ 999ê°€ ë“¤ì–´ì™”ëŠ”ì§€ nakì˜ ì—­í• ì„ í•˜ëŠ” 999ì¸ì§€ íŒë‹¨í•œë‹¤. 
+            // Expected_seqnum == next_seqnum(Áï ÆĞÅ¶ÀÇ seqnum)ÀÌÀ¯´Â ÆĞÅ¶À» ¸¸µé ¶§ ³Ø½ºÆ® ½ÃÄö½º³Ñ¹ö¸¦ ³Ö¾îÁÜÀ¸·Î ±â´ëÇÏ´Â ½ÃÄö½º´Â ÆĞÅ¶³»ºÎÀÇ ½ÃÄö½º ³Ñ¹öÀÌ´ç.
+            //(¿©±â ºÎºĞ Áß¿ä)
+            tolayer5(1, packet.payload);    //layer5 ¿¡°Ô data Àü´Ş
+            B_my_acknum = expected_seqnum_B; //acknumÀ» expected sequence number·Î ÀúÀåÇÏ¸ç °»½Å
+            printf("B_input :got ACK and make ACK Áï A »çÀÌµå¿¡ º¸³¾ ACK (´©Àû ack È¤Àº ½Ç½Ã°£ À¸·Î °»½ÅÇÑ ack = %d)\n", B_my_acknum);
+            expected_seqnum_B++;     //BÀÇ expected seqeunce number¸¦ 1Áõ°¡½ÃÅ´ ÀÌÀ¯´Â ´ÙÀ½¿¡µµ °°Àº ¿µ¿ªÀ¸·Î Àü´ŞÇÏ´Â ÆĞÅ¶À» ¹ŞÀ» ¶§ È®ÀÎÇØ¾ßÇÏ°í ÀÌ¶§ ±â´ëÇÏ´Â ½ÃÄö½º ³Ñ¹ö´Â ÀÌ ºÎºĞÀ» Áö³­ ´ÙÀ½
+                                    //¼ıÀÚ 1ÀÌ Áõ°¡ÇÑ »óÅÂ¿¡¼­ ºñ±³ ÇØ¾ßÇÔÀ¸·Î (¿©±â ºÎºĞ Áß¿ä)
+            ack_check++; //ack¸¦ Ã¤Å©ÇÔÀ¸·Î½á 999°¡ µé¾î¿ÔÀ» ¶§ ÃÊ±âÀÇ ack¸¦ °¡Áö°í ÀÖÁö ¾Ê¾Æ¼­ 999°¡ µé¾î¿Ô´ÂÁö nakÀÇ ¿ªÇÒÀ» ÇÏ´Â 999ÀÎÁö ÆÇ´ÜÇÑ´Ù. 
         }
         else 
         {
-            //out of orderì˜ ê²½ìš° drop
+            //out of orderÀÇ °æ¿ì drop
             printf("B_input : not the expected seq. (expected_seq = %d)\n", expected_seqnum_B);
 
         }
-        //senderë¡œì„œì˜ ë™ì‘
-        if (acknum != 999&& ack_check !=0 )  //acknum ì´ 999ê°€ ì•„ë‹ë•Œ, ì¦‰ NAKê°€ ì•„ë‹ë•Œ
+        //sender·Î¼­ÀÇ µ¿ÀÛ
+        if (acknum != 999&& ack_check !=0 )  //acknum ÀÌ 999°¡ ¾Æ´Ò¶§, Áï NAK°¡ ¾Æ´Ò¶§
         {
             send_base_B = acknum + 1;
             if (send_base_B == next_seqnum_B)
@@ -341,48 +341,48 @@ B_input(struct pkt packet)
             else
             {
                 //Start timer
-                stoptimer(1, (float)TIMEOUT);//ì•ˆì „í•œ ì¼œê¸°ë¥¼ ìœ„í•œ íƒ€ì´ë¨¸ ê»ë‹¤ í‚¤ê¸°
-                starttimer(1, (float)TIMEOUT);//íƒ€ì´ë¨¸ ì¼œê¸° íƒ€ì´ë¨¸ ì—°ì¥ ëŠë‚Œ
+                stoptimer(1, (float)TIMEOUT);//¾ÈÀüÇÑ ÄÑ±â¸¦ À§ÇÑ Å¸ÀÌ¸Ó ²¯´Ù Å°±â
+                starttimer(1, (float)TIMEOUT);//Å¸ÀÌ¸Ó ÄÑ±â Å¸ÀÌ¸Ó ¿¬Àå ´À³¦
                 printf("B_input : start timer.\n");
             }
         }
-        else if(acknum == 999&&ack_check == 0)//acknumì´ ì‹¤í–‰ ì´ˆê¸°ì˜ ackë¥¼ ê°€ì§€ê³  ìˆì§€ ì•Šì•„ì„œ 999ì¼ë•Œë¥¼ ì œì™¸í•˜ê³  ì¦‰ NAKì˜ ì—­í• ì„ í•˜ëŠ” 999ì¼ë•Œ
+        else if(acknum == 999&&ack_check == 0)//acknumÀÌ ½ÇÇà ÃÊ±âÀÇ ack¸¦ °¡Áö°í ÀÖÁö ¾Ê¾Æ¼­ 999ÀÏ¶§¸¦ Á¦¿ÜÇÏ°í Áï NAKÀÇ ¿ªÇÒÀ» ÇÏ´Â 999ÀÏ¶§
         {
             //Got NAK
-            printf("B_input : got NAK (ack = %d). Drop\n", packet.acknum);// ë„¤í¬ëŠ” ì²˜ë¦¬ ì•Šê³  ê·¸ëƒ¥ ë²„ë¦¼
+            printf("B_input : got NAK (ack = %d). Drop\n", packet.acknum);// ³×Å©´Â Ã³¸® ¾Ê°í ±×³É ¹ö¸²
         }
         
     }
-    else  //checksumì— ì´ìƒì´ ìˆëŠ” ê²½ìš° ë°›ì€ packet ë²„ë¦¼
+    else  //checksum¿¡ ÀÌ»óÀÌ ÀÖ´Â °æ¿ì ¹ŞÀº packet ¹ö¸²
     {
         //Packet corrupted
-        printf("B_input : Packet corrupted (seq = %d). Drop\n", packet.seqnum);//checksumì— ì´ìƒì´ ìˆëŠ” ê²½ìš° ë°›ì€ packet ë²„ë¦¼
+        printf("B_input : Packet corrupted (seq = %d). Drop\n", packet.seqnum);//checksum¿¡ ÀÌ»óÀÌ ÀÖ´Â °æ¿ì ¹ŞÀº packet ¹ö¸²
     }
 }
 
 void A_timerinterrupt(void)
 {
-    //timeoutì‹œ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
-    //printf("A í˜¸ì¶œí–ˆìŠµë‹¹-------\n");
-    for (int i = send_base_A-1; i < next_seqnum_A-1; i++) //í˜„ì¬ base ë¶€í„° nextsequence number-1ê¹Œì§€ì˜ packet ì¬ì „ì†¡ ì—¬ê¸°ì„œ send_base_A-1ê°€ í˜„ì¬ baseì„
+    //timeout½Ã È£ÃâµÇ´Â ÇÔ¼ö
+    //printf("A È£ÃâÇß½À´ç-------\n");
+    for (int i = send_base_A-1; i < next_seqnum_A-1; i++) //ÇöÀç base ºÎÅÍ nextsequence number-1±îÁöÀÇ packet ÀçÀü¼Û ¿©±â¼­ send_base_A-1°¡ ÇöÀç baseÀÓ
     {
         printf("A_timerinterrupt : resend packet (seq = %d). data : ", pkt_A_window[i].seqnum);
         for (int j = 0; j < 20; j++)
             printf("%c", pkt_A_window[i].payload[j]);
         printf("\n");
 
-        //ì¬ì „ì†¡
+        //ÀçÀü¼Û
         tolayer3(0, pkt_A_window[i]);
     }
-    //stoptimer(0, (float)TIMEOUT);//ì•ˆì „í•œ ì¼œê¸°ë¥¼ ìœ„í•œ íƒ€ì´ë¨¸ ê»ë‹¤ í‚¤ê¸°
-    starttimer(0, (float)TIMEOUT); //íƒ€ì´ë¨¸ ì‹œì‘
+    //stoptimer(0, (float)TIMEOUT);//¾ÈÀüÇÑ ÄÑ±â¸¦ À§ÇÑ Å¸ÀÌ¸Ó ²¯´Ù Å°±â
+    starttimer(0, (float)TIMEOUT); //Å¸ÀÌ¸Ó ½ÃÀÛ
 }
 
-//timeoutì‹œ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜
+//timeout½Ã È£ÃâµÇ´Â ÇÔ¼ö
 void B_timerinterrupt(void)
 {
-   //printf("B í˜¸ì¶œí–ˆìŠµë‹¹-------\n");
-    for (int i = send_base_B-1; i < next_seqnum_B-1; i++)    //í˜„ì¬ base ë¶€í„° nextsequence number-1ê¹Œì§€ì˜ packet ì¬ì „ì†¡ ì—¬ê¸°ì„œ send_base_B-1ê°€ í˜„ì¬ baseì„
+   //printf("B È£ÃâÇß½À´ç-------\n");
+    for (int i = send_base_B-1; i < next_seqnum_B-1; i++)    //ÇöÀç base ºÎÅÍ nextsequence number-1±îÁöÀÇ packet ÀçÀü¼Û ¿©±â¼­ send_base_B-1°¡ ÇöÀç baseÀÓ
     {
         printf("B_timerinterrupt : resend packet (seq = %d). data : ", pkt_B_window[i].seqnum);
         for (int j = 0; j < 20; j++)
@@ -390,8 +390,8 @@ void B_timerinterrupt(void)
         printf("\n");
         tolayer3(1, pkt_B_window[i]);
     }
-    //stoptimer(1, (float)TIMEOUT);//ì•ˆì „í•œ ì¼œê¸°ë¥¼ ìœ„í•œ íƒ€ì´ë¨¸ ê»ë‹¤ í‚¤ê¸°
-    starttimer(1, (float)TIMEOUT); //íƒ€ì´ë¨¸ ì‹œì‘
+    //stoptimer(1, (float)TIMEOUT);//¾ÈÀüÇÑ ÄÑ±â¸¦ À§ÇÑ Å¸ÀÌ¸Ó ²¯´Ù Å°±â
+    starttimer(1, (float)TIMEOUT); //Å¸ÀÌ¸Ó ½ÃÀÛ
 }
 
 
